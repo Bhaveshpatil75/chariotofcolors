@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${category} + ' - Chariot Of Colors'">Category</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+    <nav>
+        <div class="logo"><a th:href="@{/}">ChariotOfColors</a></div>
+        <ul>
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/order}">Book Order</a></li>
+        </ul>
+    </nav>
+
+    <div class="container" style="padding-top: 100px;">
+        <h1 th:text="${category}" style="text-align: center; font-size: 3rem; margin-bottom: 20px;">Category</h1>
+        <p style="text-align: center; color: var(--text-secondary); margin-bottom: 40px;">Explore our collection of
+            <span th:text="${category}"></span>.
+        </p>
+
+        <div style="text-align: center; margin-bottom: 60px;">
+            <a th:href="@{/order(artType=${category})}" class="btn">Order a <span th:text="${category}"></span></a>
+        </div>
+
+        <div class="gallery-grid"
+            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;">
+            <div th:each="art : ${artPieces}" class="art-card">
+                <a th:href="@{/art/{id}(id=${art.id})}">
+                    <img th:src="${art.imageUrl}" th:alt="${art.title}" onerror="this.style.display='none';">
+                    <!-- Hide img on error to show background loading spinner -->
+                    <div class="art-overlay">
+                        <h3 th:text="${art.title}">Title</h3>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(artPieces)}"
+            style="text-align: center; padding: 40px; color: var(--text-secondary);">
+            <p>No artworks found in this category yet.</p>
+        </div>
+    </div>
+
+    <footer
+        style="text-align: center; padding: 40px; color: var(--text-secondary); border-top: 1px solid var(--card-border); margin-top: 40px;">
+        <p>&copy; 2024 Chariot Of Colors. All rights reserved.</p>
+    </footer>
+
+</body>
+
+</html>

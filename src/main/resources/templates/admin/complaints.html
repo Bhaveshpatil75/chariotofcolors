@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaints - Chariot Of Colors</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            color: white;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 15px;
+            border-bottom: 1px solid var(--card-border);
+            vertical-align: top;
+        }
+
+        th {
+            background-color: rgba(255, 255, 255, 0.05);
+            font-family: var(--font-heading);
+            color: var(--accent-tertiary);
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="logo">Admin Dashboard</div>
+        <ul>
+            <li><a th:href="@{/admin/dashboard}">Orders</a></li>
+            <li><a th:href="@{/admin/art-pieces}">Art Pieces</a></li>
+            <li><a th:href="@{/admin/complaints}" class="active">Complaints</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="container" style="padding-top: 120px;">
+        <div class="glass-panel" style="width: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>User Complaints</h2>
+                <div class="status-badge">Total: <span th:text="${#lists.size(complaints)}">0</span></div>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Subject</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="complaint : ${complaints}">
+                            <td th:text="${#temporals.format(complaint.submissionDate, 'yyyy-MM-dd HH:mm')}">2024-01-01
+                            </td>
+                            <td th:text="${complaint.name}">John Doe</td>
+                            <td th:text="${complaint.email}">john@example.com</td>
+                            <td th:text="${complaint.subject}">Service Issue</td>
+                            <td th:text="${complaint.description}">Description here...</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(complaints)}">
+                            <td colspan="5" style="text-align: center; color: var(--text-secondary);">No complaints
+                                found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

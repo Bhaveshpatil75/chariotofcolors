@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Art Piece - Chariot Of Colors</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+    <nav>
+        <div class="logo">Admin Dashboard</div>
+        <ul>
+            <li><a th:href="@{/admin/dashboard}">Orders</a></li>
+            <li><a th:href="@{/admin/art-pieces}" class="active">Art Pieces</a></li>
+            <li><a th:href="@{/admin/complaints}">Complaints</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="container" style="padding-top: 120px;">
+        <div class="glass-panel" style="max-width: 800px; margin: 0 auto;">
+            <h2 style="margin-bottom: 30px;">Add New Art Piece</h2>
+
+            <form th:action="@{/admin/art-pieces/add}" th:object="${artPiece}" method="post">
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 10px; color: var(--text-secondary);">Title</label>
+                    <input type="text" th:field="*{title}" required
+                        style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: white;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 10px; color: var(--text-secondary);">Type</label>
+                    <select th:field="*{type}"
+                        style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); background: #1a1a1a; color: white;">
+                        <option value="GALLERY">Gallery Item</option>
+                        <option value="ABOUT_US">About Us Image</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 10px; color: var(--text-secondary);">Category</label>
+                    <select th:field="*{category}"
+                        style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); background: #1a1a1a; color: white;">
+                        <option value="Canvas Painting">Canvas Painting</option>
+                        <option value="Sketch">Sketch</option>
+                        <option value="Portrait">Portrait</option>
+                        <option value="Abstract">Abstract</option>
+                        <option value="Site Asset">Site Asset (for non-gallery items)</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 10px; color: var(--text-secondary);">Price</label>
+                    <input type="text" th:field="*{price}" placeholder="e.g. ₹250" required
+                        style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: white;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 10px; color: var(--text-secondary);">Thumbnail URL
+                        (Shown on listings)</label>
+                    <input type="text" th:field="*{thumbnailUrl}" placeholder="https://..." required
+                        style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: white;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 10px; color: var(--text-secondary);">Main Image
+                        URL</label>
+                    <input type="text" th:field="*{imageUrl}" placeholder="https://..." required
+                        style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: white;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 10px; color: var(--text-secondary);">Additional
+                        Images</label>
+                    <div id="additional-images-container">
+                        <div style="margin-bottom: 10px;">
+                            <input type="text" name="imageUrls" placeholder="Additional Image URL"
+                                style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: white;">
+                        </div>
+                    </div>
+                    <button type="button" onclick="addUserInfoField()"
+                        style="padding: 8px 16px; background: rgba(255,255,255,0.1); border: 1px solid var(--card-border); color: white; border-radius: 6px; cursor: pointer; font-size: 0.9rem;">+
+                        Add Another Image</button>
+                    <script>
+                        function addUserInfoField() {
+                            const container = document.getElementById('additional-images-container');
+                            const div = document.createElement('div');
+                            div.style.marginBottom = '10px';
+                            div.innerHTML = `
+                                <input type="text" name="imageUrls" placeholder="Additional Image URL"
+                                    style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: white;">
+                            `;
+                            container.appendChild(div);
+                        }
+                    </script>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 30px;">
+                    <label
+                        style="display: block; margin-bottom: 10px; color: var(--text-secondary);">Description</label>
+                    <textarea th:field="*{description}" rows="5" required
+                        style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: white; resize: vertical;"></textarea>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <button type="submit" class="btn">Add Art Piece</button>
+                    <a th:href="@{/admin/art-pieces}" class="btn"
+                        style="background: transparent; border: 1px solid var(--accent-primary);">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>

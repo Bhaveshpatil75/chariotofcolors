@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head(${art.title} + ' - Chariot Of Colors')}"></head>
+
+<body>
+
+    <nav th:replace="~{fragments :: navbar}"></nav>
+
+    <div class="container" style="padding-top: 120px; padding-bottom: 60px;">
+        <div class="glass-panel" style="display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap;">
+
+            <div style="flex: 1; min-width: 300px; position: relative;">
+                <!-- Main Gallery Container -->
+                <div class="gallery-container"
+                    style="position: relative; border-radius: 12px; overflow: hidden; margin-bottom: 20px;">
+                    <img id="mainImage" th:src="${art.imageUrl}" th:alt="${art.title}"
+                        onerror="this.onerror=null;this.src='/images/loading.png';"
+                        style="width: 100%; display: block; transition: opacity 0.3s ease; min-height: 300px; background: url('/images/loading.png') center no-repeat; background-size: contain;">
+
+                    <!-- Navigation Arrows -->
+                    <button onclick="changeImage(-1)"
+                        style="position: absolute; top: 50%; left: 10px; transform: translateY(-50%); background: rgba(0,0,0,0.5); border: none; color: white; padding: 10px; cursor: pointer; border-radius: 50%; font-size: 1.2rem;">&#10094;</button>
+                    <button onclick="changeImage(1)"
+                        style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); background: rgba(0,0,0,0.5); border: none; color: white; padding: 10px; cursor: pointer; border-radius: 50%; font-size: 1.2rem;">&#10095;</button>
+                </div>
+
+                <!-- Dots / Thumbnails Navigation -->
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                    <img th:src="${art.imageUrl}" class="gallery-dot active" onclick="setImage(0)"
+                        style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; cursor: pointer; border: 2px solid var(--accent-color); opacity: 1;">
+
+                    <th:block th:each="img, stat : ${art.imageUrls}">
+                        <img th:src="${img}" class="gallery-dot" th:onclick="'setImage(' + ${stat.count} + ')'"
+                            style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; cursor: pointer; border: 2px solid transparent; opacity: 0.6;">
+                    </th:block>
+                </div>
+
+                <!-- Render image URLs as hidden elements to be read by JS -->
+                <div id="gallery-data" style="display:none;">
+                    <span class="gallery-img-url" th:text="${art.imageUrl}"></span>
+                    <th:block th:each="img : ${art.imageUrls}">
+                        <span class="gallery-img-url" th:text="${img}"></span>
+                    </th:block>
+                </div>
+
+                <script>
+                    const mainImage = document.getElementById('mainImage');
+
+                    // Read images from DOM
+                    const galleryData = document.getElementById('gallery-data');
+                    const allImages = Array.from(galleryData.querySelectorAll('.gallery-img-url')).map(span => span.textContent);
+
+                    let currentIndex = 0;
+
+                    function setImage(index) {
+                        currentIndex = index;
+                        updateGallery();
+                    }
+
+                    function changeImage(direction) {
+                        currentIndex += direction;
+                        if (currentIndex >= allImages.length) currentIndex = 0;
+                        if (currentIndex < 0) currentIndex = allImages.length - 1;
+                        updateGallery();
+                    }
+
+                    function updateGallery() {
+                        mainImage.style.opacity = '0';
+                        setTimeout(() => {
+                            if (allImages.length > 0) {
+                                mainImage.src = allImages[currentIndex];
+                            }
+                            mainImage.style.opacity = '1';
+                        }, 200);
+
+                        // Update dots active state
+                        const dots = document.querySelectorAll('.gallery-dot');
+                        dots.forEach((dot, idx) => {
+                            if (idx === currentIndex) {
+                                dot.style.border = '2px solid var(--accent-color)';
+                                dot.style.opacity = '1';
+                            } else {
+                                dot.style.border = '2px solid transparent';
+                                dot.style.opacity = '0.6';
+                            }
+                        });
+                    }
+                </script>
+            </div>
+
+            <div style="flex: 1; min-width: 300px;">
+                <h1 th:text="${art.title}" style="margin-bottom: 15px; font-size: 2.5rem;">Art Title</h1>
+
+                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <span class="status-badge" style="background: var(--accent-color); color: white;"
+                        th:text="${art.category}">Category</span>
+                    <span class="status-badge"
+                        style="font-size: 1.2rem; background: var(--accent-secondary); color: white;"
+                        th:text="${#strings.replace(art.price, '$', '₹')}">Pricing</span>
+                </div>
+
+                <p th:text="${art.description}"
+                    style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 30px; white-space: pre-line;">
+                    Description...
+                </p>
+
+                <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--card-border);">
+                    <h3 style="margin-bottom: 10px;">Interested in a similar piece?</h3>
+                    <p style="margin-bottom: 20px; color: var(--text-secondary);">Every piece is unique, but we can
+                        create a similar artwork tailored to your preferences.</p>
+                    <a th:href="@{/order(artType=${art.category}, refTitle=${art.title})}" class="btn"
+                        style="width: 100%; text-align: center;">Book Similar</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div th:replace="~{fragments :: chat}"></div>
+</body>
+
+</html>

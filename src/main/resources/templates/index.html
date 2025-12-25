@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head('Chariot Of Colors - Art Gallery')}"></head>
+
+<body>
+
+    <nav th:replace="~{fragments :: navbar}"></nav>
+
+    <header class="hero">
+        <div class="container">
+            <h1>"Every artist dips his brush in his own soul."</h1>
+            <p class="quote">- Henry Ward Beecher</p>
+            <p style="margin-top: 10px; max-width: 600px; margin-left: auto; margin-right: auto;">
+                Welcome to Chariot Of Colors, where imagination meets the canvas.
+                Explore our world of vibrant emotions and timeless pieces.
+            </p>
+            <br>
+            <a th:href="@{/order}" class="btn">Book an Order</a>
+        </div>
+    </header>
+
+    <section id="gallery" class="gallery-section">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 20px; font-size: 3rem;">Selected Works</h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 40px;">Click on any piece to see
+                more details</p>
+        </div>
+        <div class="marquee-container">
+            <!-- Double the content for smooth loop -->
+            <div class="marquee-content">
+                <div class="art-card" th:each="art : ${artPieces}">
+                    <a th:href="@{/art/{id}(id=${art.id})}">
+                        <img th:src="${not #strings.isEmpty(art.thumbnailUrl) ? art.thumbnailUrl : art.imageUrl}"
+                            th:alt="${art.title}" onerror="this.onerror=null;this.src='/images/loading.png';">
+                        <div class="art-overlay">
+                            <h3 th:text="${art.title}">Title</h3>
+                            <p style="font-size: 0.9rem;" th:text="${art.category}">Category</p>
+                        </div>
+                    </a>
+                </div>
+                <!-- Duplicate again to ensure continuity in animation -->
+                <div class="art-card" th:each="art : ${artPieces}">
+                    <a th:href="@{/art/{id}(id=${art.id})}">
+                        <img th:src="${not #strings.isEmpty(art.thumbnailUrl) ? art.thumbnailUrl : art.imageUrl}"
+                            th:alt="${art.title}" onerror="this.onerror=null;this.src='/images/loading.png';">
+                        <div class="art-overlay">
+                            <h3 th:text="${art.title}">Title</h3>
+                            <p style="font-size: 0.9rem;" th:text="${art.category}">Category</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const container = document.querySelector('.marquee-container');
+            let scrollAmount = 0;
+            let isHovered = false;
+
+            // Auto-scroll speed (pixels per frame)
+            const speed = 1;
+
+            function autoScroll() {
+                if (!isHovered) {
+                    container.scrollLeft += speed;
+
+                    // Reset scroll for infinite loop effect
+                    // Check if we've scrolled past half the content (assuming duplication)
+                    // This creates a seamless loop if the content is truly duplicated and identical
+                    if (container.scrollLeft >= (container.scrollWidth - container.clientWidth)) {
+                        container.scrollLeft = 0;
+                    }
+                }
+                requestAnimationFrame(autoScroll);
+            }
+
+            // Start auto-scroll
+            requestAnimationFrame(autoScroll);
+
+            // Pause on hover
+            container.addEventListener('mouseenter', () => {
+                isHovered = true;
+            });
+
+            container.addEventListener('mouseleave', () => {
+                isHovered = false;
+            });
+        });
+
+        function copyPhoneNumber() {
+            const phoneElement = document.getElementById('phone-number');
+            const originalText = phoneElement.innerText;
+            const phoneNumber = originalText.trim();
+
+            navigator.clipboard.writeText(phoneNumber).then(() => {
+                // Visual feedback
+                const originalColor = phoneElement.style.color;
+                phoneElement.style.color = '#4CAF50'; // Green color to indicate success
+                phoneElement.innerText = "Copied!";
+
+                setTimeout(() => {
+                    phoneElement.style.color = originalColor;
+                    phoneElement.innerText = originalText;
+                }, 1500);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+    </script>
+
+    <section id="categories">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 40px;">Our Services & Price Range</h2>
+            <div class="category-grid">
+                <a th:href="@{/category/Canvas Painting}" class="cat-card">
+                    <div class="cat-title">Canvas Paintings</div>
+                    <div class="cat-price">Starts from ₹200</div>
+                    <p style="font-size: 0.9rem; margin-top: 10px; color: var(--text-secondary);">Oil, Acrylic, and
+                        Mixed Media on high-quality canvas.</p>
+                </a>
+                <a th:href="@{/category/Wedding Gift}" class="cat-card">
+                    <div class="cat-title">Wedding Gifts</div>
+                    <div class="cat-price">Starts from ₹150</div>
+                    <p style="font-size: 0.9rem; margin-top: 10px; color: var(--text-secondary);">Couple portraits and
+                        romantic sceneries.</p>
+                </a>
+                <a th:href="@{/category/Birthday Gift}" class="cat-card">
+                    <div class="cat-title">Birthday Gifts</div>
+                    <div class="cat-price">Starts from ₹100</div>
+                    <p style="font-size: 0.9rem; margin-top: 10px; color: var(--text-secondary);">Personalized pop-art
+                        and fun caricatures.</p>
+                </a>
+                <a th:href="@{/category/Gifts for Lovers}" class="cat-card">
+                    <div class="cat-title">Gifts for Lovers</div>
+                    <div class="cat-price">Starts from ₹120</div>
+                    <p style="font-size: 0.9rem; margin-top: 10px; color: var(--text-secondary);">Sentimental sketches
+                        and memory captures.</p>
+                </a>
+                <a th:href="@{/category/Home Decoration}" class="cat-card">
+                    <div class="cat-title">Home Decorations</div>
+                    <div class="cat-price">Starts from ₹300</div>
+                    <p style="font-size: 0.9rem; margin-top: 10px; color: var(--text-secondary);">Large scale abstract
+                        and modern art for your walls.</p>
+                </a>
+                <a th:href="@{/category/Sketch}" class="cat-card">
+                    <div class="cat-title">Sketches</div>
+                    <div class="cat-price">Starts from ₹80</div>
+                    <p style="font-size: 0.9rem; margin-top: 10px; color: var(--text-secondary);">Pencil and charcoal
+                        detailed sketches.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="reviews" style="background: rgba(0,0,0,0.2);">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 40px;">What People Say</h2>
+            <div class="review-grid">
+                <div class="review-card" th:each="review : ${reviews}">
+                    <div class="review-header">
+                        <div class="reviewer-name" th:text="${review.reviewerName}">User</div>
+                        <div class="review-date" th:text="${#temporals.format(review.deliveryDate, 'yyyy-MM-dd')}">
+                            2024-01-01</div>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--accent-primary); margin-bottom: 5px;">
+                        <span th:text="${review.artType}">Type</span> - <span
+                            th:text="${review.category}">Category</span>
+                    </div>
+                    <p style="font-style: italic;" th:text="${review.content}">"Great work!"</p>
+                </div>
+            </div>
+
+            <div class="glass-panel" style="max-width: 600px; margin: 40px auto 0; padding: 30px;">
+                <h3 style="text-align: center; margin-bottom: 20px;">Write a Review</h3>
+                <form th:action="@{/submit-review}" method="post">
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <input type="text" name="reviewerName" placeholder="Your Name" required
+                            style="width: 100%; padding: 10px; border-radius: 5px; border: none;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <input type="text" name="artType" placeholder="Art Title/Type" required
+                            style="width: 100%; padding: 10px; border-radius: 5px; border: none;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <select name="category" required
+                            style="width: 100%; padding: 10px; border-radius: 5px; border: none;">
+                            <option value="" disabled selected>Select Category</option>
+                            <option value="Canvas Painting">Canvas Painting</option>
+                            <option value="Wedding Gift">Wedding Gift</option>
+                            <option value="Birthday Gift">Birthday Gift</option>
+                            <option value="Gifts for Lovers">Gifts for Lovers</option>
+                            <option value="Home Decoration">Home Decoration</option>
+                            <option value="Sketch">Sketch</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <textarea name="content" placeholder="Your Review" required rows="4"
+                            style="width: 100%; padding: 10px; border-radius: 5px; border: none;"></textarea>
+                    </div>
+                    <button type="submit" class="btn" style="width: 100%;">Submit Review</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section id="about">
+        <div class="container grid-2">
+            <div class="glass-panel">
+                <h2>About Us</h2>
+                <br>
+                <p>
+                    Chariot Of Colors is more than just a gallery; it is a movement.
+                    We believe that color is a power which directly influences the soul.
+                    Our team of passionate artists is dedicated to bringing your deepest visions to life through
+                    strokes of genius and splashes of paint.
+                </p>
+            </div>
+            <div>
+                <img th:src="${aboutUsImage.imageUrl}" th:alt="${aboutUsImage.title}"
+                    onerror="this.onerror=null;this.src='/images/loading.png';"
+                    style="width: 100%; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="container" style="text-align: center;">
+            <div class="glass-panel" style="max-width: 600px; margin: 0 auto;">
+                <h2>Contact Us</h2>
+                <br>
+                <p>Have questions? Reach out to us directly.</p>
+                <br>
+                <p>Email: <strong><a href="mailto:chariotofcolors@gmail.com"
+                            style="color: inherit; text-decoration: underline;">chariotofcolors@gmail.com</a></strong>
+                </p>
+                <p>Phone/Whatsapp: <strong id="phone-number" style="cursor: pointer;" title="Click to copy"
+                        onclick="copyPhoneNumber()">+91 7498503673 </strong></p>
+
+                <hr style="margin: 30px 0; border-color: rgba(255,255,255,0.1);">
+
+                <h3>Register a Complaint</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 20px; color: var(--text-secondary);">We value your feedback.
+                    Let us know if something went wrong.</p>
+                <form th:action="@{/submit-complaint}" method="post" style="text-align: left;">
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <input type="text" name="name" placeholder="Your Name" required
+                            style="width: 100%; padding: 10px; border-radius: 5px; border: none;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <input type="email" name="email" placeholder="Your Email" required
+                            style="width: 100%; padding: 10px; border-radius: 5px; border: none;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <input type="text" name="subject" placeholder="Subject" required
+                            style="width: 100%; padding: 10px; border-radius: 5px; border: none;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <textarea name="description" placeholder="Describe your issue..." required rows="4"
+                            style="width: 100%; padding: 10px; border-radius: 5px; border: none;"></textarea>
+                    </div>
+                    <button type="submit" class="btn" style="width: 100%; background-color: #ff4444;">Submit
+                        Complaint</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer
+        style="text-align: center; padding: 40px; color: var(--text-secondary); border-top: 1px solid var(--card-border); margin-top: 40px;">
+        <p>Developed by <a href="https://github.com/Bhaveshpatil75">Bhavesh Patil</a></p>
+    </footer>
+
+    <div th:replace="~{fragments :: chat}"></div>
+</body>
+
+</html>

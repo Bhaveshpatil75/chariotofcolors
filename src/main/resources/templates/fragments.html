@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- Head Fragment -->
+
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">Chariot Of Colors</title>
+    <link rel="icon" href="/images/violet.png">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+    <!-- Navbar Fragment -->
+    <nav th:fragment="navbar">
+        <div class="logo">
+            <a th:href="@{/}" style="display: flex; align-items: center; gap: 10px;">
+                <img src="/images/violet.png" alt="Logo" class="nav-logo-img">
+                <span class="logo-text">Chariot Of Colors</span>
+            </a>
+        </div>
+        <ul>
+            <li><a th:href="@{/}" href="#about">About</a></li>
+            <li><a th:href="@{/}" href="#gallery">Gallery</a></li>
+            <li><a th:href="@{/}" href="#categories">Services</a></li>
+            <li><a th:href="@{/}" href="#reviews">Reviews</a></li>
+            <li><a th:href="@{/}" href="#contact">Contact</a></li>
+            <li><a th:href="@{/login}">Admin</a></li>
+        </ul>
+        <a th:href="@{/order}" class="btn">Book an Order</a>
+    </nav>
+
+    <!-- Chat Widget Fragment -->
+    <div th:fragment="chat">
+        <div class="chat-widget-btn" id="chatBtn">
+            <div class="chat-bubble">Hi, I'm Violet! 👋</div>
+            <img src="/images/violet.png" alt="Violet" class="chat-avatar">
+        </div>
+
+        <div class="chat-window" id="chatWindow">
+            <div class="chat-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img src="/images/violet.png"
+                        style="width: 30px; height: 30px; border-radius: 50%; border: 2px solid white;">
+                    <h3>Violet</h3>
+                </div>
+                <div class="chat-controls">
+                    <button class="maximize-chat" id="maximizeChat">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+                        </svg>
+                    </button>
+                    <button class="close-chat" id="closeChat">&times;</button>
+                </div>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    Hello! I'm Violet. How can I help you today?
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Type a message...">
+                <button id="sendBtn">Send</button>
+            </div>
+        </div>
+
+        <script>
+            // Ensure elements exist before adding listeners to prevent errors on pages where fragment might be misused
+            document.addEventListener('DOMContentLoaded', () => {
+                const chatBtn = document.getElementById('chatBtn');
+                const chatWindow = document.getElementById('chatWindow');
+                const closeChat = document.getElementById('closeChat');
+                const maximizeChat = document.getElementById('maximizeChat');
+                const sendBtn = document.getElementById('sendBtn');
+                const chatInput = document.getElementById('chatInput');
+                const chatMessages = document.getElementById('chatMessages');
+
+                if (!chatBtn || !chatWindow) return;
+
+                function toggleChat() {
+                    chatWindow.classList.toggle('active');
+                }
+
+                function toggleMaximize() {
+                    chatWindow.classList.toggle('maximized');
+                    const isMax = chatWindow.classList.contains('maximized');
+                    maximizeChat.innerHTML = isMax
+                        ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>'
+                        : '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>';
+                }
+
+                chatBtn.addEventListener('click', toggleChat);
+                closeChat.addEventListener('click', toggleChat);
+                maximizeChat.addEventListener('click', toggleMaximize);
+
+                function appendMessage(text, sender) {
+                    const msgDiv = document.createElement('div');
+                    msgDiv.classList.add('message', sender);
+                    msgDiv.textContent = text;
+                    chatMessages.appendChild(msgDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+
+                async function sendMessage() {
+                    const text = chatInput.value.trim();
+                    if (!text) return;
+
+                    appendMessage(text, 'user');
+                    chatInput.value = '';
+
+                    const loadingDiv = document.createElement('div');
+                    loadingDiv.classList.add('message', 'bot');
+                    loadingDiv.textContent = '...';
+                    loadingDiv.id = 'loadingMsg';
+                    chatMessages.appendChild(loadingDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                    try {
+                        const response = await fetch('/api/chat', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ message: text })
+                        });
+
+                        const loadingMsg = document.getElementById('loadingMsg');
+                        if (loadingMsg) loadingMsg.remove();
+
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            appendMessage("I am not feeling well, please try again later.", 'bot');
+                            return;
+                        }
+
+                        const data = await response.json();
+
+                        if (data.reply) {
+                            appendMessage(data.reply, 'bot');
+                        } else {
+                            appendMessage("Sorry, received empty response.", 'bot');
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        const loadingMsg = document.getElementById('loadingMsg');
+                        if (loadingMsg) loadingMsg.remove();
+                        appendMessage("I am not feeling well, please try again later.", 'bot');
+                    }
+                }
+
+                sendBtn.addEventListener('click', sendMessage);
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') sendMessage();
+                });
+            });
+        </script>
+    </div>
+
+</body>
+
+</html>

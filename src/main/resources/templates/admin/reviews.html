@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Reviews - Chariot Of Colors Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            color: white;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 15px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        th {
+            background-color: rgba(255, 255, 255, 0.05);
+            font-family: var(--font-heading);
+            color: var(--accent-tertiary);
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .status-approved {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+
+        .status-pending {
+            background-color: rgba(241, 196, 15, 0.2);
+            color: #f1c40f;
+        }
+
+        .top10-true {
+            color: gold;
+            font-weight: bold;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .btn-approve {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .btn-delete {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-toggle {
+            background-color: #3498db;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="logo">Admin Dashboard</div>
+        <ul>
+            <li><a th:href="@{/admin/dashboard}">Orders</a></li>
+            <li><a th:href="@{/admin/art-pieces}">Art Pieces</a></li>
+            <li><a th:href="@{/admin/complaints}">Complaints</a></li>
+            <li><a th:href="@{/admin/reviews}">Reviews</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="container" style="padding-top: 120px;">
+        <div class="glass-panel" style="width: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Manage Reviews</h2>
+                <div class="status-badge">Total Reviews: <span th:text="${#lists.size(reviews)}">0</span></div>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Reviewer</th>
+                            <th>Art Type / Category</th>
+                            <th>Content</th>
+                            <th>Status</th>
+                            <th>Top 10</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="review : ${reviews}">
+                            <td th:text="${#temporals.format(review.deliveryDate, 'yyyy-MM-dd')}">2024-01-01</td>
+                            <td th:text="${review.reviewerName}">User</td>
+                            <td>
+                                <span th:text="${review.artType}">Type</span> /
+                                <span th:text="${review.category}">Cat</span>
+                            </td>
+                            <td th:text="${review.content}">Nice...</td>
+                            <td>
+                                <span th:if="${review.approved}" class="status-badge status-approved">Approved</span>
+                                <span th:unless="${review.approved}" class="status-badge status-pending">Pending</span>
+                            </td>
+                            <td>
+                                <span th:if="${review.top10}" class="top10-true">★ Yes</span>
+                                <span th:unless="${review.top10}">No</span>
+                            </td>
+                            <td>
+                                <div style="display: flex;">
+                                    <form th:if="${!review.approved}"
+                                        th:action="@{/admin/reviews/approve/{id}(id=${review.id})}" method="post">
+                                        <button type="submit" class="action-btn btn-approve">Approve</button>
+                                    </form>
+                                    <form th:action="@{/admin/reviews/toggle-top10/{id}(id=${review.id})}"
+                                        method="post">
+                                        <button type="submit" class="action-btn btn-toggle"
+                                            th:text="${review.top10 ? 'Unmark Top 10' : 'Mark Top 10'}">Toggle</button>
+                                    </form>
+                                    <form th:action="@{/admin/reviews/delete/{id}(id=${review.id})}" method="post"
+                                        onsubmit="return confirm('Are you sure?');">
+                                        <button type="submit" class="action-btn btn-delete">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(reviews)}">
+                            <td colspan="7" style="text-align: center; color: var(--text-secondary);">No reviews found.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

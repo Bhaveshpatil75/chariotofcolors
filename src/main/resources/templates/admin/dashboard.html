@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Chariot Of Colors</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            color: white;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 15px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        th {
+            background-color: rgba(255, 255, 255, 0.05);
+            font-family: var(--font-heading);
+            color: var(--accent-tertiary);
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="logo">Admin Dashboard</div>
+        <ul>
+            <li><a th:href="@{/admin/dashboard}">Orders</a></li>
+            <li><a th:href="@{/admin/art-pieces}">Art Pieces</a></li>
+            <li><a th:href="@{/admin/complaints}">Complaints</a></li>
+            <li><a th:href="@{/admin/reviews}">Reviews</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="container" style="padding-top: 120px;">
+        <div class="glass-panel" style="width: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Order Requests</h2>
+                <div class="status-badge">Total Orders: <span th:text="${#lists.size(orders)}">0</span></div>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Customer</th>
+                            <th>Email</th>
+                            <th>Contact</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="order : ${orders}">
+                            <td th:text="${order.id}">1</td>
+                            <td th:text="${order.customerName}">John Doe</td>
+                            <td th:text="${order.email}">john@example.com</td>
+                            <td th:text="${order.contactNumber}">1234567890</td>
+                            <td th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}">2024-01-01</td>
+                            <td><span class="status-badge" th:text="${order.status}">PENDING</span></td>
+                            <td th:text="${order.description}">A painting of...</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(orders)}">
+                            <td colspan="7" style="text-align: center; color: var(--text-secondary);">No orders found.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

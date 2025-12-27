@@ -21,15 +21,39 @@
                 <span class="logo-text">Chariot Of Colors</span>
             </a>
         </div>
-        <ul>
+
+        <button class="mobile-menu-toggle" aria-label="Toggle navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <ul class="nav-links">
             <li><a th:href="@{/}" href="#about">About</a></li>
             <li><a th:href="@{/}" href="#gallery">Gallery</a></li>
             <li><a th:href="@{/}" href="#categories">Services</a></li>
             <li><a th:href="@{/}" href="#reviews">Reviews</a></li>
             <li><a th:href="@{/}" href="#contact">Contact</a></li>
             <li><a th:href="@{/login}">Admin</a></li>
+            <!-- Mobile visible button only -->
+            <li class="mobile-only-li"><a th:href="@{/order}" class="btn" style="width: 100%; text-align: center;">Book
+                    Order</a></li>
         </ul>
-        <a th:href="@{/order}" class="btn">Book an Order</a>
+        <a th:href="@{/order}" class="btn desktop-only-btn">Book an Order</a>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const mobileMenuBtn = document.querySelector('.mobile-menu-toggle');
+                const navLinks = document.querySelector('.nav-links');
+
+                if (mobileMenuBtn) {
+                    mobileMenuBtn.addEventListener('click', function () {
+                        this.classList.toggle('active');
+                        navLinks.classList.toggle('active');
+                    });
+                }
+            });
+        </script>
     </nav>
 
     <!-- Chat Widget Fragment -->

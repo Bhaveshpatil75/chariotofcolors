@@ -31,6 +31,13 @@ body {
     font-family: var(--font-body);
     overflow-x: hidden;
     line-height: 1.6;
+    padding-top: 85px;
+    padding-bottom: 250px;
+    /* Space for Violet Widget */
+}
+
+html {
+    overflow-x: hidden;
 }
 
 h1,
@@ -89,11 +96,16 @@ section {
 .container {
     max-width: 1200px;
     margin: 0 auto;
+    width: 100%;
+    /* Ensure it doesn't overflow */
+    padding: 0 20px;
+    /* Add padding for small screens */
 }
 
 /* Hero Section */
 .hero {
-    height: 100vh;
+    min-height: calc(100vh - 85px);
+    /* Adjust height */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -122,54 +134,55 @@ section {
     animation: fadeInUp 1s ease-out 0.5s backwards;
 }
 
-/* Infinity Marquee Gallery */
+/* Carousel Gallery (Replacing Marquee) */
 .gallery-section {
     padding: 100px 0;
     overflow: hidden;
 }
 
-.marquee-container {
-    display: flex;
+.carousel-container {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
     overflow-x: auto;
+    /* Enable native horizontal scroll */
     overflow-y: hidden;
-    gap: 20px;
-    padding-bottom: 20px;
+    padding: 20px 0;
     scroll-behavior: smooth;
-    /* Custom Scrollbar Styling */
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) var(--card-bg);
+    scrollbar-width: none;
+    /* Hide scrollbar Firefox */
 }
 
-.marquee-container::-webkit-scrollbar {
-    height: 20px;
-    /* Increased height as requested */
+.carousel-container::-webkit-scrollbar {
+    display: none;
+    /* Hide scrollbar Chrome/Safari */
 }
 
-.marquee-container::-webkit-scrollbar-track {
-    background: var(--card-bg);
-    border-radius: 10px;
-}
-
-.marquee-container::-webkit-scrollbar-thumb {
-    background: linear-gradient(45deg, var(--accent-color), var(--accent-secondary));
-    border-radius: 10px;
-    border: 2px solid var(--primary-bg);
-}
-
-.marquee-content {
+.carousel-track {
     display: flex;
     gap: 20px;
-    min-width: 100%;
-    /* Animation removed for manual control */
+    width: max-content;
+    align-items: center;
+    /* transition removed to rely on container scroll-behavior */
+}
+
+.carousel-slide {
+    flex: 0 0 auto;
+    width: auto;
+    /* Variable width based on content */
+    max-width: 90vw;
+    /* Prevent huge images from overflowing viewport */
+    display: flex;
+    justify-content: center;
 }
 
 .art-card {
-    /* Flex item defaults for marquee */
-    flex: 0 0 auto;
-    width: auto;
-    min-width: 200px;
-    /* Reduced min-width to fit better */
     height: 400px;
+    /* Fixed height for the row */
+    width: auto;
+    /* Width determined by image */
+    min-width: 200px;
+    /* Prevent collapse while loading */
     background-color: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: 20px;
@@ -178,14 +191,23 @@ section {
     transition: transform 0.3s ease;
     display: flex;
     justify-content: center;
-    /* Center loading spinner */
     align-items: center;
-    /* Placeholder background for loading state */
     background-image: url('/images/loading.png');
     background-size: 50px;
-    /* Small logo/spinner size */
     background-position: center;
     background-repeat: no-repeat;
+}
+
+/* Mobile Breakpoint for Carousel */
+@media (max-width: 768px) {
+    .art-card {
+        height: 300px;
+        /* Smaller height on mobile */
+    }
+
+    .hero h1 {
+        font-size: 3rem;
+    }
 }
 
 /* Grid context override */
@@ -199,21 +221,23 @@ section {
 .art-card a {
     display: block;
     height: 100%;
-    width: 100%;
+    width: auto;
+    /* Allow link to shrink wrap */
 }
 
 .art-card:hover {
     transform: scale(1.03);
-    /* Subtle zoom */
     z-index: 2;
     border-color: var(--accent-color);
 }
 
 .art-card img {
-    width: 100%;
     height: 100%;
-    object-fit: cover;
-    /* Ensure image fills card */
+    width: auto;
+    /* Maintain aspect ratio, defining width */
+    max-width: 100%;
+    object-fit: contain;
+    /* Ensure full image is visible */
     display: block;
     transition: opacity 0.3s ease;
 }
@@ -223,14 +247,11 @@ section {
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.6) 80%, transparent);
     padding: 20px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.art-card:hover .art-overlay {
     opacity: 1;
+    /* Permanently visible */
+    transition: opacity 0.3s ease;
 }
 
 /* Category Cards */

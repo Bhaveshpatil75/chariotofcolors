@@ -1,22 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${category} + ' - Chariot Of Colors'">Category</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
+<head th:replace="~{fragments :: head(${category} + ' - Chariot Of Colors')}"></head>
 
 <body>
 
-    <nav>
-        <div class="logo"><a th:href="@{/}">ChariotOfColors</a></div>
-        <ul>
-            <li><a th:href="@{/}">Home</a></li>
-            <li><a th:href="@{/order}">Book Order</a></li>
-        </ul>
-    </nav>
+    <nav th:replace="~{fragments :: navbar}"></nav>
 
     <div class="container" style="padding-top: 100px;">
         <h1 th:text="${category}" style="text-align: center; font-size: 3rem; margin-bottom: 20px;">Category</h1>
@@ -49,8 +38,10 @@
 
     <footer
         style="text-align: center; padding: 40px; color: var(--text-secondary); border-top: 1px solid var(--card-border); margin-top: 40px;">
-        <p>&copy; 2024 Chariot Of Colors. All rights reserved.</p>
+        <p>Developed by <a href="https://github.com/Bhaveshpatil75">Bhavesh Patil</a></p>
     </footer>
+
+    <div th:replace="~{fragments :: chat}"></div>
 
 </body>
 

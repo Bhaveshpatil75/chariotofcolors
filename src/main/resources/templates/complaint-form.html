@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head('File a Complaint - Chariot Of Colors')}"></head>
+
+<body>
+
+    <nav th:replace="~{fragments :: navbar}"></nav>
+
+    <div class="container" style="padding-top: 100px; display: flex; justify-content: center;">
+        <div class="glass-panel" style="max-width: 600px; width: 100%; padding: 30px;">
+            <h2 style="text-align: center; margin-bottom: 20px;">Register a Complaint</h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 30px;">
+                We value your feedback. Let us know if something went wrong.
+            </p>
+            <form th:action="@{/submit-complaint}" method="post">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Your Name</label>
+                    <input type="text" name="name" placeholder="Your Name" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Email Address</label>
+                    <input type="email" name="email" placeholder="Your Email" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Subject</label>
+                    <input type="text" name="subject" placeholder="What is the issue?" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Description</label>
+                    <textarea name="description" placeholder="Describe your issue in detail..." required
+                        rows="4"></textarea>
+                </div>
+                <button type="submit" class="btn" style="width: 100%; background-color: #ff4444;">Submit
+                    Complaint</button>
+            </form>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <a th:href="@{/}" style="color: var(--text-secondary); font-size: 0.9rem;">&larr; Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <footer
+        style="text-align: center; padding: 40px; color: var(--text-secondary); border-top: 1px solid var(--card-border); margin-top: 40px;">
+        <p>Developed by <a href="https://github.com/Bhaveshpatil75">Bhavesh Patil</a></p>
+    </footer>
+
+</body>
+
+</html>

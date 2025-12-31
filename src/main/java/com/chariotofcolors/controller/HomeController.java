@@ -91,6 +91,22 @@ public class HomeController {
     @Autowired
     private com.chariotofcolors.repository.ComplaintRepository complaintRepository;
 
+    @GetMapping("/write-review")
+    public String writeReview() {
+        return "review-form";
+    }
+
+    @GetMapping("/complaint")
+    public String complaint() {
+        return "complaint-form";
+    }
+
+    @GetMapping("/more-reviews")
+    public String moreReviews(Model model) {
+        model.addAttribute("reviews", reviewRepository.findByApprovedTrue());
+        return "more-reviews";
+    }
+
     @GetMapping("/login")
     public String login() {
         return "login";

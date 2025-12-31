@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head('All Reviews - Chariot Of Colors')}"></head>
+
+<body>
+
+    <nav th:replace="~{fragments :: navbar}"></nav>
+
+    <section id="reviews">
+        <div class="container" style="padding-top: 50px;">
+            <h2 class="section-title">Customer Reviews</h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 40px;">What our customers say
+                about us.</p>
+
+            <div class="review-grid">
+                <div class="review-card" th:each="review : ${reviews}">
+                    <div class="review-header">
+                        <div class="reviewer-name" th:text="${review.reviewerName}">User</div>
+                        <div class="review-date" th:text="${#temporals.format(review.deliveryDate, 'yyyy-MM-dd')}">
+                            2024-01-01</div>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--accent-primary); margin-bottom: 5px;">
+                        <span th:text="${review.artType}">Type</span> - <span
+                            th:text="${review.category}">Category</span>
+                    </div>
+                    <p style="font-style: italic;" th:text="${review.content}">"Great work!"</p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <a th:href="@{/write-review}" class="btn">Write a Review</a>
+                <br><br>
+                <a th:href="@{/}" style="color: var(--text-secondary); text-decoration: underline;">Back to Home</a>
+            </div>
+        </div>
+    </section>
+
+    <footer
+        style="text-align: center; padding: 40px; color: var(--text-secondary); border-top: 1px solid var(--card-border); margin-top: 40px;">
+        <p>Developed by <a href="https://github.com/Bhaveshpatil75">Bhavesh Patil</a></p>
+    </footer>
+
+    <div th:replace="~{fragments :: chat}"></div>
+
+</body>
+
+</html>

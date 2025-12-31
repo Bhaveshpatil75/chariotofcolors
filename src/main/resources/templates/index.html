@@ -25,90 +25,95 @@
             <h2 class="section-title">Selected Works</h2>
             <p style="text-align: center; color: var(--text-secondary); margin-bottom: 40px;">Click on any piece to see
                 more details</p>
-        </div>
-        <div class="marquee-container">
-            <!-- Double the content for smooth loop -->
-            <div class="marquee-content">
-                <div class="art-card" th:each="art : ${artPieces}">
-                    <a th:href="@{/art/{id}(id=${art.id})}">
-                        <img th:src="${not #strings.isEmpty(art.thumbnailUrl) ? art.thumbnailUrl : art.imageUrl}"
-                            th:alt="${art.title}" onerror="this.onerror=null;this.src='/images/loading.png';">
-                        <div class="art-overlay">
-                            <h3 th:text="${art.title}">Title</h3>
-                            <p style="font-size: 0.9rem;" th:text="${art.category}">Category</p>
+
+            <div class="carousel-container">
+                <div class="carousel-track">
+                    <div class="carousel-slide" th:each="art : ${artPieces}">
+                        <div class="art-card">
+                            <a th:href="@{/art/{id}(id=${art.id})}">
+                                <img th:src="${not #strings.isEmpty(art.thumbnailUrl) ? art.thumbnailUrl : art.imageUrl}"
+                                    th:alt="${art.title}" onerror="this.onerror=null;this.src='/images/loading.png';">
+                                <div class="art-overlay">
+                                    <h3 th:text="${art.title}">Title</h3>
+                                    <p style="font-size: 0.9rem;" th:text="${art.category}">Category</p>
+                                </div>
+                            </a>
                         </div>
-                    </a>
+                    </div>
                 </div>
-                <!-- Duplicate again to ensure continuity in animation -->
-                <div class="art-card" th:each="art : ${artPieces}">
-                    <a th:href="@{/art/{id}(id=${art.id})}">
-                        <img th:src="${not #strings.isEmpty(art.thumbnailUrl) ? art.thumbnailUrl : art.imageUrl}"
-                            th:alt="${art.title}" onerror="this.onerror=null;this.src='/images/loading.png';">
-                        <div class="art-overlay">
-                            <h3 th:text="${art.title}">Title</h3>
-                            <p style="font-size: 0.9rem;" th:text="${art.category}">Category</p>
-                        </div>
-                    </a>
-                </div>
+                <!-- Controls removed as per request -->
             </div>
         </div>
     </section>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const container = document.querySelector('.marquee-container');
-            let scrollAmount = 0;
-            let isHovered = false;
+            // Carousel Logic
+            const container = document.querySelector('.carousel-container');
 
-            // Auto-scroll speed (pixels per frame)
-            const speed = 1;
+            // Native Scroll Logic
+            window.moveCarousel = function (direction) {
+                const scrollAmount = container.clientWidth < 768 ? container.clientWidth : 350; // Scroll by one item approx
 
-            function autoScroll() {
-                if (!isHovered) {
-                    container.scrollLeft += speed;
-
-                    // Reset scroll for infinite loop effect
-                    // Check if we've scrolled past half the content (assuming duplication)
-                    // This creates a seamless loop if the content is truly duplicated and identical
-                    if (container.scrollLeft >= (container.scrollWidth - container.clientWidth)) {
-                        container.scrollLeft = 0;
-                    }
+                // Check if at end to loop back
+                if (direction > 0 && (container.scrollLeft + container.clientWidth >= container.scrollWidth - 10)) {
+                    container.scrollTo({ left: 0, behavior: 'smooth' });
                 }
-                requestAnimationFrame(autoScroll);
+                // Check if at start to loop to end
+                else if (direction < 0 && container.scrollLeft <= 10) {
+                    container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' });
+                }
+                else {
+                    container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+                }
             }
 
-            // Start auto-scroll
-            requestAnimationFrame(autoScroll);
+            // Auto Slide (Faster: 2000ms) with Pause on Hover
+            let autoSlideInterval = setInterval(() => {
+                moveCarousel(1);
+            }, 2000);
 
-            // Pause on hover
             container.addEventListener('mouseenter', () => {
-                isHovered = true;
+                clearInterval(autoSlideInterval);
             });
 
             container.addEventListener('mouseleave', () => {
-                isHovered = false;
+                autoSlideInterval = setInterval(() => {
+                    moveCarousel(1);
+                }, 2000);
             });
+
+            // Reviews Mobile Logic
+            const reviews = Array.from(document.querySelectorAll('.review-card'));
+
+            if (window.innerWidth < 768) {
+                reviews.forEach((review, index) => {
+                    if (index >= 2) {
+                        review.style.display = 'none';
+                    }
+                });
+            }
+
+            // Copy Phone Logic
+            window.copyPhoneNumber = function () { // Expose to window
+                const phoneElement = document.getElementById('phone-number');
+                const originalText = phoneElement.innerText;
+                const phoneNumber = originalText.trim();
+
+                navigator.clipboard.writeText(phoneNumber).then(() => {
+                    const originalColor = phoneElement.style.color;
+                    phoneElement.style.color = '#4CAF50';
+                    phoneElement.innerText = "Copied!";
+
+                    setTimeout(() => {
+                        phoneElement.style.color = originalColor;
+                        phoneElement.innerText = originalText;
+                    }, 1500);
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+            }
         });
-
-        function copyPhoneNumber() {
-            const phoneElement = document.getElementById('phone-number');
-            const originalText = phoneElement.innerText;
-            const phoneNumber = originalText.trim();
-
-            navigator.clipboard.writeText(phoneNumber).then(() => {
-                // Visual feedback
-                const originalColor = phoneElement.style.color;
-                phoneElement.style.color = '#4CAF50'; // Green color to indicate success
-                phoneElement.innerText = "Copied!";
-
-                setTimeout(() => {
-                    phoneElement.style.color = originalColor;
-                    phoneElement.innerText = originalText;
-                }, 1500);
-            }).catch(err => {
-                console.error('Failed to copy text: ', err);
-            });
-        }
     </script>
 
     <section id="categories">
@@ -173,37 +178,14 @@
                 </div>
             </div>
 
-            <div class="glass-panel" style="max-width: 600px; margin: 40px auto 0; padding: 30px;">
-                <h3 style="text-align: center; margin-bottom: 20px;">Write a Review</h3>
-                <form th:action="@{/submit-review}" method="post">
-                    <div class="form-group" style="margin-bottom: 15px;">
-                        <input type="text" name="reviewerName" placeholder="Your Name" required
-                            style="width: 100%; padding: 10px; border-radius: 5px; border: none;">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 15px;">
-                        <input type="text" name="artType" placeholder="Art Title/Type" required
-                            style="width: 100%; padding: 10px; border-radius: 5px; border: none;">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 15px;">
-                        <select name="category" required
-                            style="width: 100%; padding: 10px; border-radius: 5px; border: none;">
-                            <option value="" disabled selected>Select Category</option>
-                            <option value="Canvas Painting">Canvas Painting</option>
-                            <option value="Wedding Gift">Wedding Gift</option>
-                            <option value="Birthday Gift">Birthday Gift</option>
-                            <option value="Gifts for Lovers">Gifts for Lovers</option>
-                            <option value="Home Decoration">Home Decoration</option>
-                            <option value="Sketch">Sketch</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="margin-bottom: 15px;">
-                        <textarea name="content" placeholder="Your Review" required rows="4"
-                            style="width: 100%; padding: 10px; border-radius: 5px; border: none;"></textarea>
-                    </div>
-                    <button type="submit" class="btn" style="width: 100%;">Submit Review</button>
-                </form>
+            <!-- View More / Write Review Buttons -->
+            <div
+                style="text-align: center; margin-top: 40px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                <a th:href="@{/more-reviews}" class="btn"
+                    style="background: transparent; border: 1px solid var(--accent-color);">View All Reviews</a>
+                <a th:href="@{/write-review}" class="btn">Write a Review</a>
             </div>
+
         </div>
     </section>
 
@@ -222,7 +204,7 @@
             <div>
                 <img th:src="${aboutUsImage.imageUrl}" th:alt="${aboutUsImage.title}"
                     onerror="this.onerror=null;this.src='/images/loading.png';"
-                    style="width: 100%; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
+                    style="width: 100%; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
             </div>
         </div>
     </section>
@@ -245,26 +227,8 @@
                 <h3>Register a Complaint</h3>
                 <p style="font-size: 0.9rem; margin-bottom: 20px; color: var(--text-secondary);">We value your feedback.
                     Let us know if something went wrong.</p>
-                <form th:action="@{/submit-complaint}" method="post" style="text-align: left;">
-                    <div class="form-group" style="margin-bottom: 15px;">
-                        <input type="text" name="name" placeholder="Your Name" required
-                            style="width: 100%; padding: 10px; border-radius: 5px; border: none;">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 15px;">
-                        <input type="email" name="email" placeholder="Your Email" required
-                            style="width: 100%; padding: 10px; border-radius: 5px; border: none;">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 15px;">
-                        <input type="text" name="subject" placeholder="Subject" required
-                            style="width: 100%; padding: 10px; border-radius: 5px; border: none;">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 15px;">
-                        <textarea name="description" placeholder="Describe your issue..." required rows="4"
-                            style="width: 100%; padding: 10px; border-radius: 5px; border: none;"></textarea>
-                    </div>
-                    <button type="submit" class="btn" style="width: 100%; background-color: #ff4444;">Submit
-                        Complaint</button>
-                </form>
+
+                <a th:href="@{/complaint}" class="btn" style="background: #ff4444; color: white;">File a Complaint</a>
             </div>
         </div>
     </section>

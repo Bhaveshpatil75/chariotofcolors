@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{fragments :: head('Chariot Of Colors - Art Gallery')}"></head>
+<head th:replace="~{fragments :: head('Chariot Of Colors - Home Page')}"></head>
 
 <body>
 
@@ -202,9 +202,9 @@
                 </p>
             </div>
             <div>
-                <img th:src="${aboutUsImage.imageUrl}" th:alt="${aboutUsImage.title}"
+                <img src="/images/about-us.png" alt="About Us"
                     onerror="this.onerror=null;this.src='/images/loading.png';"
-                    style="width: 100%; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    style="width: 100%; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5)); transform: scale(1.05);">
             </div>
         </div>
     </section>

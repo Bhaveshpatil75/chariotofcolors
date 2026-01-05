@@ -452,10 +452,11 @@ nav .logo {
 }
 
 .nav-logo-img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 2px solid var(--accent-secondary);
+    width: 60px;
+    height: 60px;
+    border-radius: 0;
+    border: none;
+    object-fit: contain;
 }
 
 .logo-text {
@@ -467,6 +468,12 @@ nav .logo {
     font-size: 1.8rem;
     /* Bigger text */
     letter-spacing: 0.5px;
+}
+
+.logo-text-img {
+    height: 50px;
+    width: auto;
+    transition: height 0.3s ease;
 }
 
 nav ul {
@@ -785,6 +792,11 @@ nav ul li a:hover {
     .nav-logo-img {
         width: 35px;
         height: 35px;
+    }
+
+    .logo-text-img {
+        height: 30px;
+        width: auto;
     }
 
     .logo-text {

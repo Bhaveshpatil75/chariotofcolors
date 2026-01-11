@@ -1,0 +1,63 @@
+/* Modern Keyframes & Micro-interactions */
+
+/* Glassmorphism Hover Effect */
+.glass-hover-effect {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.glass-hover-effect:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Kinetic Typography for Hero */
+.hero-title-char {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* Scroll Progress Bar (Optional, can be added to body) */
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-color), #ff00de);
+    width: 0%;
+    z-index: 9999;
+    transition: width 0.1s ease-out;
+}
+
+/* Custom AOS extensions if needed */
+[data-aos="rotate-c"] {
+    transform: rotate(-5deg);
+    opacity: 0;
+    transition-property: transform, opacity;
+}
+
+[data-aos="rotate-c"].aos-animate {
+    transform: rotate(0);
+    opacity: 1;
+}
+
+/* Button Pulse Effect */
+@keyframes pulse-glow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(220, 20, 60, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(220, 20, 60, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(220, 20, 60, 0);
+    }
+}
+
+.btn-pulse:hover {
+    animation: pulse-glow 1.5s infinite;
+}

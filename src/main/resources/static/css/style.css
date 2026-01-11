@@ -122,7 +122,6 @@ section {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: fadeInDown 1s ease-out;
 }
 
 .hero p.quote {
@@ -131,7 +130,6 @@ section {
     color: var(--text-secondary);
     max-width: 800px;
     margin-bottom: 40px;
-    animation: fadeInUp 1s ease-out 0.5s backwards;
 }
 
 /* Carousel Gallery (Replacing Marquee) */

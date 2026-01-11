@@ -9,9 +9,12 @@
     <title th:text="${title}">Chariot Of Colors</title>
     <link rel="icon" href="/images/favicon.png">
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+    <link rel="stylesheet" th:href="@{/css/animations.css}">
 </head>
 
 <body>
+    <div id="scrollProgress" class="scroll-progress"></div>
 
     <!-- Navbar Fragment -->
     <nav th:fragment="navbar">
@@ -181,6 +184,12 @@
         </script>
     </div>
 
+    <!-- Scripts Fragment -->
+    <div th:fragment="scripts">
+        <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+        <script th:src="@{/js/animations.js}"></script>
+    </div>
 </body>
 
 </html>

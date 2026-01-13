@@ -20,28 +20,26 @@
         </div>
     </header>
 
-    <section id="gallery" class="gallery-section" data-aos="fade-up">
-        <div class="container">
-            <h2 class="section-title">Selected Works</h2>
-            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 40px;">Click on any piece to see
-                more details</p>
+    <section id="gallery" class="film-roll-section">
+        <!-- Header -->
+        <div style="width: 100%; text-align: center; margin-bottom: 40px; z-index: 20; position: relative;"
+            data-aos="fade-down">
+            <h2 class="section-title" style="color: white; text-shadow: 0 4px 10px rgba(0,0,0,0.8);">Selected Works</h2>
+            <p style="color: rgba(255,255,255,0.7);">Experience the collection in motion</p>
+        </div>
 
-            <div class="carousel-container">
-                <div class="carousel-track">
-                    <div class="carousel-slide" th:each="art : ${artPieces}">
-                        <div class="art-card glass-hover-effect" data-aos="zoom-in" data-aos-delay="100">
-                            <a th:href="@{/art/{id}(id=${art.id})}">
-                                <img th:src="${not #strings.isEmpty(art.thumbnailUrl) ? art.thumbnailUrl : art.imageUrl}"
-                                    th:alt="${art.title}" onerror="this.onerror=null;this.src='/images/loading.png';">
-                                <div class="art-overlay">
-                                    <h3 th:text="${art.title}">Title</h3>
-                                    <p style="font-size: 0.9rem;" th:text="${art.category}">Category</p>
-                                </div>
-                            </a>
+        <div class="film-roll-container">
+            <div class="film-roll-track">
+                <div class="film-roll-item" th:each="art : ${artPieces}">
+                    <a th:href="@{/art/{id}(id=${art.id})}">
+                        <img th:src="${not #strings.isEmpty(art.thumbnailUrl) ? art.thumbnailUrl : art.imageUrl}"
+                            th:alt="${art.title}" onerror="this.onerror=null;this.src='/images/loading.png';">
+                        <div class="film-roll-info">
+                            <h3 th:text="${art.title}">Title</h3>
+                            <p th:text="${art.category}">Category</p>
                         </div>
-                    </div>
+                    </a>
                 </div>
-                <!-- Controls removed as per request -->
             </div>
         </div>
     </section>

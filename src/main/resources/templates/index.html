@@ -7,6 +7,18 @@
 
     <nav th:replace="~{fragments :: navbar}"></nav>
 
+    <!-- Notice Bar -->
+    <div class="notice-bar">
+        <div class="notice-container">
+            <div class="notice-text-wrapper">
+                <div class="notice-text">
+                    ⚠️ Website is currently in <strong>Testing Mode</strong>. If you encounter any bugs, errors, or have feature suggestions, please report them! You can Call us, contact us via WhatsApp, Email (details in About Us), or simply use the 'File Complaint' button. &nbsp;&nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp;&nbsp; ⚠️ Website is currently in <strong>Testing Mode</strong>. If you encounter any bugs, errors, or have feature suggestions, please report them! You can <strong>CALL</strong> us, contact us via WhatsApp, Email (details in About Us), or simply use the button here.
+                </div>
+            </div>
+            <a th:href="@{/complaint}" class="notice-btn">File Complaint</a>
+        </div>
+    </div>
+
     <header class="hero">
         <div class="container">
             <h1>"Every artist dips his brush in his own soul."</h1>

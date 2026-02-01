@@ -33,7 +33,8 @@
                 <div class="film-roll-item" th:each="art : ${artPieces}">
                     <a th:href="@{/art/{id}(id=${art.id})}">
                         <img th:src="${not #strings.isEmpty(art.thumbnailUrl) ? art.thumbnailUrl : art.imageUrl}"
-                            th:alt="${art.title}" onerror="this.onerror=null;this.src='/images/loading.png';">
+                            th:alt="${art.title}" loading="lazy"
+                            onerror="this.onerror=null;this.src='/images/logo-full.png';this.style.objectFit='contain';this.style.padding='40px';this.style.backgroundColor='rgba(255,255,255,0.05)';">
                         <div class="film-roll-info">
                             <h3 th:text="${art.title}">Title</h3>
                             <p th:text="${art.category}">Category</p>

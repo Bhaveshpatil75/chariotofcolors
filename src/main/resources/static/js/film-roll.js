@@ -1,89 +1,160 @@
 /**
  * Film Roll Cinematic Animation
  * Handles horizontal scrolling, infinite looping, and dynamic visual effects.
+ * Now with Touch & Mouse Drag support (Strict Scroll, No Momentum).
  */
 
 document.addEventListener('DOMContentLoaded', () => {
     const track = document.querySelector('.film-roll-track');
-    if (!track) return; // Exit if no film roll on page
-
     const container = document.querySelector('.film-roll-container');
-    let originalItems = Array.from(track.querySelectorAll('.film-roll-item'));
 
+    if (!track || !container) return;
+
+    let originalItems = Array.from(track.querySelectorAll('.film-roll-item'));
     if (originalItems.length === 0) return;
 
     // --- Configuration ---
     const CONFIG = {
-        speed: 1.0,           // Pixels per frame. Lower = slower/more cinematic.
-        scaleCenter: 1.3,     // Scale of component in center
-        scaleSide: 0.8,       // Scale of components at valid edges
-        blurSide: 5,          // Max blur in px
-        opacitySide: 0.5,     // Min opacity
-        brightnessSide: 0.4,  // Min brightness
-        focusZone: 0.3        // Fraction of screen width that is "near center"
+        baseSpeed: 1.0,       // Normal auto-scroll speed
+        scaleCenter: 1.3,
+        scaleSide: 0.8,
+        blurSide: 5,
+        opacitySide: 0.5,
+        brightnessSide: 0.4,
+        dragMultiplier: 1.5   // Sensitivity of drag
     };
 
     let items = [];
-    let trackWidth = 0;
     let scrollPos = 0;
-    let isHovered = false;
     let animationId;
+
+    // Interaction State
+    let isDragging = false;
+    let lastX = 0;
+    let isInteracting = false;
+    let resumeAutoScrollTimer;
 
     // --- Initialization ---
 
     function init() {
-        // Clone items to fill sufficient space for infinite scroll
-        // We need at least enough width to cover the screen plus buffers.
-        // A safe bet is 3x or 4x the screen width, or just enough sets to ensure smoothness.
-        // For a true infinite loop by resetting position, we typically need 2 sets visible + 1 buffer.
-        // Let's simplified approach: Just duplicate enough times to be huge, or use modulo arithmetic logic.
+        // Calculate initial total width
+        let initialTotalWidth = 0;
+        originalItems.forEach(item => {
+            const style = window.getComputedStyle(item);
+            initialTotalWidth += item.offsetWidth + parseFloat(style.marginLeft) + parseFloat(style.marginRight);
+        });
 
-        // Better approach for performance: 
-        // 1. Calculate total width of one set.
-        // 2. Clone until total width > 2 * window.innerWidth + 1 set width.
-
-        const itemStyle = window.getComputedStyle(originalItems[0]);
-        const itemWidth = originalItems[0].offsetWidth +
-            parseFloat(itemStyle.marginLeft) +
-            parseFloat(itemStyle.marginRight);
-
-        const setWidth = itemWidth * originalItems.length;
-        const requiredWidth = window.innerWidth * 3;
-
-        // Clone original items to fill required width
+        // If width is 0 (images not loaded), retry shortly or wait for load event interactions
+        // We'll proceed with best guess, but observing is key.
+        const requiredWidth = window.innerWidth * 4;
+        const setWidth = initialTotalWidth || window.innerWidth; // Fallback
         const cloneCount = Math.max(2, Math.ceil(requiredWidth / setWidth));
 
-        // Clear track and rebuild
         track.innerHTML = '';
 
         for (let i = 0; i < cloneCount; i++) {
             originalItems.forEach(item => {
                 const clone = item.cloneNode(true);
+                const img = clone.querySelector('img');
+                if (img) {
+                    img.draggable = false;
+                    // Force a re-measure on load if stuck
+                    img.onload = measureAndReflow;
+                }
                 track.appendChild(clone);
             });
         }
 
-        // Re-query items
         items = Array.from(track.querySelectorAll('.film-roll-item'));
+        measureAndReflow();
 
-        // Calculate total track width based on all items
-        trackWidth = items.length * itemWidth; // Approximation
+        // Start animation loop if not running
+        if (!animationId) startAnimation();
+    }
 
-        // Precise calculation
+    function measureAndReflow() {
         let totalW = 0;
         items.forEach(item => {
             const style = window.getComputedStyle(item);
             const w = item.offsetWidth + parseFloat(style.marginLeft) + parseFloat(style.marginRight);
-            // Store specific width/offset on item for perf
             item.dataset.width = w;
             item.dataset.left = totalW;
             totalW += w;
         });
-        trackWidth = totalW;
-
-        // Start animation
-        startAnimation();
     }
+
+    // --- Interaction Handlers ---
+
+    function handleStart(x) {
+        isDragging = true;
+        isInteracting = true;
+        lastX = x;
+        container.style.cursor = 'grabbing';
+
+        // Stop any pending resume
+        clearTimeout(resumeAutoScrollTimer);
+    }
+
+    function handleMove(x) {
+        if (!isDragging) return;
+
+        const delta = (x - lastX) * CONFIG.dragMultiplier;
+        scrollPos -= delta;
+        lastX = x;
+
+        // Force immediate visual update for valid feel
+        updateVisuals();
+    }
+
+    function handleEnd() {
+        if (!isDragging) return;
+        isDragging = false;
+        container.style.cursor = 'grab';
+
+        // STRICT SCROLL: No momentum. Stop instantly.
+        // Resume auto-scroll after a short pause.
+        resumeAutoScroll();
+    }
+
+    function handleWheel(e) {
+        // Standard vertical scroll (deltaY) should SCROLL THE PAGE.
+        // Horizontal scroll (deltaX) or Shift+Wheel should SCROLL THE FILM ROLL.
+
+        const isHorizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+        const isShiftKey = e.shiftKey;
+
+        if (isHorizontal || isShiftKey) {
+            e.preventDefault();
+
+            isInteracting = true;
+            clearTimeout(resumeAutoScrollTimer);
+
+            let delta = e.deltaX;
+            if (delta === 0 && isShiftKey) delta = e.deltaY;
+
+            scrollPos += delta * 1.5;
+            updateVisuals();
+            resumeAutoScroll();
+        }
+    }
+
+    function resumeAutoScroll() {
+        clearTimeout(resumeAutoScrollTimer);
+        resumeAutoScrollTimer = setTimeout(() => {
+            isInteracting = false;
+        }, 1000); // 1s pause before resuming auto-scroll
+    }
+
+    // Mouse Events
+    container.addEventListener('mousedown', (e) => handleStart(e.pageX));
+    window.addEventListener('mousemove', (e) => handleMove(e.pageX));
+    window.addEventListener('mouseup', handleEnd);
+    container.addEventListener('wheel', handleWheel, { passive: false });
+
+    // Touch Events
+    container.addEventListener('touchstart', (e) => handleStart(e.touches[0].pageX), { passive: true });
+    window.addEventListener('touchmove', (e) => handleMove(e.touches[0].pageX), { passive: false });
+    window.addEventListener('touchend', handleEnd);
 
     // --- Animation Loop ---
 
@@ -93,98 +164,75 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function animationLoop() {
-        if (!isHovered) {
-            scrollPos += CONFIG.speed;
+        // Only move if not interacting
+        if (!isInteracting) {
+            scrollPos += CONFIG.baseSpeed;
         }
 
-        // Infinite loop reset
-        // If we have moved past 1/3 of the total width (assuming 3 sets), we can snap back?
-        // Actually, simple Modulo logic:
-        // However, we just want to reset when the FIRST SET has completely scrolled off.
+        // Infinite Loop Logic
         const oneSetCount = originalItems.length;
-        const oneSetWidth = parseFloat(items[oneSetCount].dataset.left);
-
-        if (scrollPos >= oneSetWidth) {
-            scrollPos -= oneSetWidth;
+        // Use the position of the item *after* the first set
+        // Safe check if items exist
+        if (items.length > oneSetCount) {
+            const firstSetEnd = parseFloat(items[oneSetCount].dataset.left);
+            if (firstSetEnd > 0) {
+                if (scrollPos >= firstSetEnd) {
+                    scrollPos -= firstSetEnd;
+                } else if (scrollPos < 0) {
+                    scrollPos += firstSetEnd;
+                }
+            }
         }
 
-        // Apply visual state
         updateVisuals();
-
         animationId = requestAnimationFrame(animationLoop);
     }
 
     function updateVisuals() {
-        // Center of the viewport
         const center = window.innerWidth / 2;
-
-        // Move the track
-        // We use translate3d for GPU acceleration
         track.style.transform = `translate3d(${-scrollPos}px, 0, 0)`;
 
-        // Update each item's individual style based on its SCREEN position
         items.forEach((item) => {
-            const itemLeft = parseFloat(item.dataset.left);
-            const itemWidth = parseFloat(item.dataset.width);
+            const itemLeft = parseFloat(item.dataset.left) || 0;
+            const itemWidth = parseFloat(item.dataset.width) || 300; // fallback
 
-            // Current position of item's center relative to viewport left
-            // itemScreenX = (itemLeft - scrollPos) + itemWidth/2
             const itemCenterScreen = (itemLeft - scrollPos) + (itemWidth / 2);
-
-            // Distance from center
             const dist = Math.abs(center - itemCenterScreen);
 
-            // Calculate Effect Intensity (0 to 1)
-            // 0 = at center, 1 = far away
-            // range = window.innerWidth / 2 approx
             const maxDist = window.innerWidth / 1.5;
             const intensity = Math.min(1, dist / maxDist);
 
-            // Effects
             const scale = CONFIG.scaleCenter - (intensity * (CONFIG.scaleCenter - CONFIG.scaleSide));
             const blur = intensity * CONFIG.blurSide;
             const brightness = 1 - (intensity * (1 - CONFIG.brightnessSide));
             const opacity = 1 - (intensity * (1 - CONFIG.opacitySide));
 
-            // Apply styles
-            // Use property specific transforms to avoid overwriting layout
-            // Note: Item itself doesn't move, the track does. We just Scale it.
             item.style.transform = `scale(${scale})`;
             item.style.filter = `blur(${blur}px) brightness(${brightness})`;
             item.style.opacity = opacity;
             item.style.zIndex = Math.round((1 - intensity) * 100);
 
-            // Active class for info visibility
-            // If very close to center (e.g. within 10% of width)
             if (dist < 100) {
-                if (!item.classList.contains('in-focus')) {
-                    item.classList.add('in-focus');
-                }
+                if (!item.classList.contains('in-focus')) item.classList.add('in-focus');
             } else {
-                if (item.classList.contains('in-focus')) {
-                    item.classList.remove('in-focus');
-                }
+                if (item.classList.contains('in-focus')) item.classList.remove('in-focus');
             }
         });
     }
 
-    // --- Event Listeners ---
-
-    // Pause on hover - REMOVED as per user request
-    // container.addEventListener('mouseenter', () => { isHovered = true; });
-    // container.addEventListener('mouseleave', () => { isHovered = false; });
-
-    // Resize handler (Throttle would be good, but simple init recall works for now)
+    // Observers & Listeners
     let resizeTimer;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(init, 200);
     });
 
-    // Handle touch scroll manually if needed, or let user drag?
-    // "Continuous horizontal ... moving like a film reel" usually implies auto-move.
-    // Making it draggable is nice but complex. Let's stick to simple auto-scroll + hover pause for now.
+    // Ensure layout is correct after all resources load
+    window.addEventListener('load', () => {
+        // Re-measure everything to be sure
+        measureAndReflow();
+    });
 
-    // Run
+    // Start
     init();
 });

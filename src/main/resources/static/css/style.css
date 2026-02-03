@@ -39,6 +39,8 @@ body {
 
 html {
     overflow-x: hidden;
+    scroll-padding-top: 155px;
+    /* 85px Nav + 50px Notice + 20px Buffer */
 }
 
 h1,
@@ -578,33 +580,32 @@ nav ul li a:hover {
 }
 
 .notice-btn {
-    position: absolute;
-    /* Keep it fixed on right */
+    position: fixed;
+    /* Fixed relative to viewport */
+    top: 145px;
+    /* 85px Nav + 50px Notice + 10px spacng */
     right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    /* Vertically centered */
     background: #1e293b;
     /* Dark background */
     color: white;
-    padding: 6px 18px;
-    /* Bigger button */
+    padding: 8px 20px;
     border-radius: 20px;
     font-size: 0.85rem;
     font-weight: bold;
     text-transform: uppercase;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    z-index: 10;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    /* Ensure on top */
     white-space: nowrap;
     transition: all 0.2s ease;
 }
 
 .notice-btn:hover {
-    background: #000;
-    transform: translateY(-50%) scale(1.05);
-    /* Maintain vertical center on hover */
-    color: var(--accent-color);
+    background: var(--accent-color);
+    transform: translateY(-2px);
+    color: white;
+    border-color: transparent;
 }
 
 /* Adjust body/hero padding to account for notice bar (40px) */

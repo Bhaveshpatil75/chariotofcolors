@@ -55,6 +55,14 @@
                         this.classList.toggle('active');
                         navLinks.classList.toggle('active');
                     });
+
+                    // Close menu when a link is clicked
+                    navLinks.querySelectorAll('a').forEach(link => {
+                        link.addEventListener('click', () => {
+                            mobileMenuBtn.classList.remove('active');
+                            navLinks.classList.remove('active');
+                        });
+                    });
                 }
             });
         </script>
@@ -92,6 +100,14 @@
                     mobileMenuBtn.addEventListener('click', function () {
                         this.classList.toggle('active');
                         navLinks.classList.toggle('active');
+                    });
+
+                    // Close menu when a link is clicked
+                    navLinks.querySelectorAll('a').forEach(link => {
+                        link.addEventListener('click', () => {
+                            mobileMenuBtn.classList.remove('active');
+                            navLinks.classList.remove('active');
+                        });
                     });
                 }
             });

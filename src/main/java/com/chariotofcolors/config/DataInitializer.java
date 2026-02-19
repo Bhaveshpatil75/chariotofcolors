@@ -47,7 +47,9 @@ public class DataInitializer {
                                                 "Canvas Painting", "https://picsum.photos/300/200?random=1",
                                                 "GALLERY"));
                                 artPieceRepository.save(new ArtPiece("Abstract Mind", "Deep thoughts...",
-                                                "Abstract", "https://picsum.photos/300/200?random=2", "GALLERY"));
+                                                "Canvas Painting", "https://picsum.photos/300/200?random=2",
+                                                "GALLERY")); // Replaced Abstract with Canvas Painting or similar valid
+                                                             // cat
                                 artPieceRepository.save(new ArtPiece("Forest Walk", "Greenery everywhere...",
                                                 "Sketch", "https://picsum.photos/300/200?random=3", "GALLERY"));
                                 artPieceRepository.save(new ArtPiece("Couple Portrait",
@@ -61,7 +63,7 @@ public class DataInitializer {
                                 artPieceRepository
                                                 .save(new ArtPiece("Charcoal Dreams",
                                                                 "Detailed charcoal sketch suitable for framing.",
-                                                                "Sketches", "https://picsum.photos/300/400?random=5",
+                                                                "Sketch", "https://picsum.photos/300/400?random=5",
                                                                 "GALLERY"));
                                 artPieceRepository.save(new ArtPiece("Birthday Blast", "Custom pop-art style painting.",
                                                 "Birthday Gift", "https://picsum.photos/300/400?random=6", "GALLERY"));

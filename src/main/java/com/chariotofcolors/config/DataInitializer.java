@@ -44,28 +44,26 @@ public class DataInitializer {
                         // Seed Art Pieces (Gallery Items)
                         if (artPieceRepository.count() == 0) {
                                 artPieceRepository.save(new ArtPiece("Sunset over the Hill", "A beautiful sunset...",
-                                                "$250", "Canvas Painting", "https://picsum.photos/300/200?random=1",
+                                                "Canvas Painting", "https://picsum.photos/300/200?random=1",
                                                 "GALLERY"));
-                                artPieceRepository.save(new ArtPiece("Abstract Mind", "Deep thoughts...", "$300",
+                                artPieceRepository.save(new ArtPiece("Abstract Mind", "Deep thoughts...",
                                                 "Abstract", "https://picsum.photos/300/200?random=2", "GALLERY"));
-                                artPieceRepository.save(new ArtPiece("Forest Walk", "Greenery everywhere...", "$150",
+                                artPieceRepository.save(new ArtPiece("Forest Walk", "Greenery everywhere...",
                                                 "Sketch", "https://picsum.photos/300/200?random=3", "GALLERY"));
                                 artPieceRepository.save(new ArtPiece("Couple Portrait",
                                                 "A lovely sketch for a wedding anniversary.",
-                                                "$150", "Wedding Gift", "https://picsum.photos/300/400?random=3",
+                                                "Wedding Gift", "https://picsum.photos/300/400?random=3",
                                                 "GALLERY"));
                                 artPieceRepository.save(
-                                                new ArtPiece("Neon City", "Futuristic vibes for home decor.", "$400",
+                                                new ArtPiece("Neon City", "Futuristic vibes for home decor.",
                                                                 "Home Decoration",
                                                                 "https://picsum.photos/300/400?random=4", "GALLERY"));
                                 artPieceRepository
                                                 .save(new ArtPiece("Charcoal Dreams",
                                                                 "Detailed charcoal sketch suitable for framing.",
-                                                                "$120",
                                                                 "Sketches", "https://picsum.photos/300/400?random=5",
                                                                 "GALLERY"));
                                 artPieceRepository.save(new ArtPiece("Birthday Blast", "Custom pop-art style painting.",
-                                                "$180",
                                                 "Birthday Gift", "https://picsum.photos/300/400?random=6", "GALLERY"));
                         }
                 };

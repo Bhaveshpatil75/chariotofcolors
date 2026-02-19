@@ -17,7 +17,6 @@ public class ArtPiece {
     @Column(length = 2000)
     private String description;
 
-    private String price; // e.g. "$250" or "Start from $200"
     private String category; // e.g. Canvas, Sketch
     private String imageUrl; // Main image URL
 
@@ -33,10 +32,9 @@ public class ArtPiece {
     public ArtPiece() {
     }
 
-    public ArtPiece(String title, String description, String price, String category, String imageUrl, String type) {
+    public ArtPiece(String title, String description, String category, String imageUrl, String type) {
         this.title = title;
         this.description = description;
-        this.price = price;
         this.category = category;
         this.imageUrl = imageUrl;
         this.type = type != null ? type : "GALLERY";

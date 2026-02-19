@@ -95,9 +95,7 @@
                 <div style="display: flex; gap: 15px; margin-bottom: 20px;">
                     <span class="status-badge" style="background: var(--accent-color); color: white;"
                         th:text="${art.category}">Category</span>
-                    <span class="status-badge"
-                        style="font-size: 1.2rem; background: var(--accent-secondary); color: white;"
-                        th:text="${#strings.replace(art.price, '$', '₹')}">Pricing</span>
+
                 </div>
 
                 <p th:text="${art.description}"

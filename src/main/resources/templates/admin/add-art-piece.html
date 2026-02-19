@@ -10,21 +10,14 @@
 
 <body>
 
-    <nav>
-        <div class="logo">Admin Dashboard</div>
-        <ul>
-            <li><a th:href="@{/admin/dashboard}">Orders</a></li>
-            <li><a th:href="@{/admin/art-pieces}" class="active">Art Pieces</a></li>
-            <li><a th:href="@{/admin/complaints}">Complaints</a></li>
-            <li><a th:href="@{/logout}">Logout</a></li>
-        </ul>
-    </nav>
+    <nav th:replace="~{fragments :: adminNavbar}"></nav>
 
     <div class="container" style="padding-top: 120px;">
         <div class="glass-panel" style="max-width: 800px; margin: 0 auto;">
-            <h2 style="margin-bottom: 30px;">Add New Art Piece</h2>
+            <h2 style="margin-bottom: 30px;" th:text="${artPiece.id == null ? 'Add New Art Piece' : 'Edit Art Piece'}">Manage Art Piece</h2>
 
             <form th:action="@{/admin/art-pieces/add}" th:object="${artPiece}" method="post">
+                <input type="hidden" th:field="*{id}" />
                 <div class="form-group" style="margin-bottom: 20px;">
                     <label style="display: block; margin-bottom: 10px; color: var(--text-secondary);">Title</label>
                     <input type="text" th:field="*{title}" required
@@ -53,11 +46,7 @@
                     </select>
                 </div>
 
-                <div class="form-group" style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 10px; color: var(--text-secondary);">Price</label>
-                    <input type="text" th:field="*{price}" placeholder="e.g. ₹250" required
-                        style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: white;">
-                </div>
+
 
                 <div class="form-group" style="margin-bottom: 20px;">
                     <label style="display: block; margin-bottom: 10px; color: var(--text-secondary);">Thumbnail URL
@@ -107,7 +96,7 @@
                 </div>
 
                 <div style="display: flex; gap: 15px;">
-                    <button type="submit" class="btn">Add Art Piece</button>
+                    <button type="submit" class="btn" th:text="${artPiece.id == null ? 'Add Art Piece' : 'Update Art Piece'}">Save Art Piece</button>
                     <a th:href="@{/admin/art-pieces}" class="btn"
                         style="background: transparent; border: 1px solid var(--accent-primary);">Cancel</a>
                 </div>

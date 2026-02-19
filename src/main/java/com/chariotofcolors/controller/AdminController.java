@@ -42,6 +42,15 @@ public class AdminController {
     }
 
     @SuppressWarnings("null")
+    @GetMapping("/art-pieces/edit/{id}")
+    public String editArtPieceForm(@org.springframework.web.bind.annotation.PathVariable Long id, Model model) {
+        com.chariotofcolors.model.ArtPiece artPiece = artPieceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid art piece Id:" + id));
+        model.addAttribute("artPiece", artPiece);
+        return "admin/add-art-piece";
+    }
+
+    @SuppressWarnings("null")
     @org.springframework.web.bind.annotation.PostMapping("/art-pieces/add")
     public String addArtPiece(
             @org.springframework.web.bind.annotation.ModelAttribute com.chariotofcolors.model.ArtPiece artPiece) {

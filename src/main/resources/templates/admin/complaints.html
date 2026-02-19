@@ -36,15 +36,7 @@
 
 <body>
 
-    <nav>
-        <div class="logo">Admin Dashboard</div>
-        <ul>
-            <li><a th:href="@{/admin/dashboard}">Orders</a></li>
-            <li><a th:href="@{/admin/art-pieces}">Art Pieces</a></li>
-            <li><a th:href="@{/admin/complaints}" class="active">Complaints</a></li>
-            <li><a th:href="@{/logout}">Logout</a></li>
-        </ul>
-    </nav>
+    <nav th:replace="~{fragments :: adminNavbar}"></nav>
 
     <div class="container" style="padding-top: 120px;">
         <div class="glass-panel" style="width: 100%;">

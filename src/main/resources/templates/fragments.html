@@ -60,6 +60,44 @@
         </script>
     </nav>
 
+    <!-- Admin Navbar Fragment -->
+    <nav th:fragment="adminNavbar">
+        <div class="logo">
+            <a th:href="@{/admin/dashboard}" style="display: flex; align-items: center; gap: 15px;">
+                <img src="/images/favicon.png" alt="Logo Icon" class="nav-logo-img">
+                <span style="font-family: var(--font-heading); font-size: 1.5rem; color: white;">Admin Panel</span>
+            </a>
+        </div>
+
+        <button class="mobile-menu-toggle" aria-label="Toggle navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <ul class="nav-links">
+            <li><a th:href="@{/admin/dashboard}">Orders</a></li>
+            <li><a th:href="@{/admin/art-pieces}">Art Pieces</a></li>
+            <li><a th:href="@{/admin/complaints}">Complaints</a></li>
+            <li><a th:href="@{/admin/reviews}">Reviews</a></li>
+            <li><a th:href="@{/logout}" style="color: #ff4444;">Logout</a></li>
+        </ul>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const mobileMenuBtn = document.querySelector('.mobile-menu-toggle');
+                const navLinks = document.querySelector('.nav-links');
+
+                if (mobileMenuBtn) {
+                    mobileMenuBtn.addEventListener('click', function () {
+                        this.classList.toggle('active');
+                        navLinks.classList.toggle('active');
+                    });
+                }
+            });
+        </script>
+    </nav>
+
     <!-- Chat Widget Fragment -->
     <div th:fragment="chat">
         <div class="chat-widget-btn" id="chatBtn">

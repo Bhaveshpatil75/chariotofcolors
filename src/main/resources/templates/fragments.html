@@ -6,6 +6,20 @@
 <head th:fragment="head(title)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Google Analytics -->
+    <th:block th:if="${@environment.getProperty('google.analytics.id')}">
+        <script async th:src="'https://www.googletagmanager.com/gtag/js?id=' + ${@environment.getProperty('google.analytics.id')}"></script>
+        <script th:inline="javascript">
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            
+            var gaId = /*[[${@environment.getProperty('google.analytics.id')}]]*/ 'G-XXXXXXXXXX';
+            gtag('config', gaId);
+        </script>
+    </th:block>
+
     <title th:text="${title}">Chariot Of Colors</title>
     <link rel="icon" href="/images/favicon.png">
     <link rel="stylesheet" th:href="@{/css/style.css}">

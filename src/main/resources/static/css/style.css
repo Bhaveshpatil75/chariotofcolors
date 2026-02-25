@@ -783,6 +783,15 @@ body {
     display: flex;
     flex-direction: column;
     gap: 15px;
+    /* Hide scrollbar Firefox */
+    scrollbar-width: none;
+    /* Hide scrollbar IE/Edge */
+    -ms-overflow-style: none;
+}
+
+.chat-messages::-webkit-scrollbar {
+    /* Hide scrollbar Chrome/Safari */
+    display: none;
 }
 
 .message {

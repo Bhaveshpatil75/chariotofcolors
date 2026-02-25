@@ -10,82 +10,203 @@
     <div class="container" style="padding-top: 120px; padding-bottom: 60px;">
         <div class="glass-panel" style="display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap;">
 
-            <div style="flex: 1; min-width: 280px; position: relative;">
+            <div style="flex: 1; min-width: 0; position: relative; max-width: 100%;">
+                <style>
+                    #gallery-dots-container::-webkit-scrollbar { display: none; }
+                    .gallery-container { touch-action: pan-y pinch-zoom; } 
+                </style>
                 <!-- Main Gallery Container -->
-                <div class="gallery-container"
-                    style="position: relative; border-radius: 12px; overflow: hidden; margin-bottom: 20px;">
-                    <img id="mainImage" th:src="${art.imageUrl}" th:alt="${art.title}"
-                        onerror="this.onerror=null;this.src='/images/loading.png';"
-                        style="width: 100%; display: block; transition: opacity 0.3s ease; min-height: 300px; background: url('/images/loading.png') center no-repeat; background-size: contain;">
-
-                    <!-- Navigation Arrows -->
-                    <button onclick="changeImage(-1)"
-                        style="position: absolute; top: 50%; left: 10px; transform: translateY(-50%); background: rgba(0,0,0,0.5); border: none; color: white; padding: 10px; cursor: pointer; border-radius: 50%; font-size: 1.2rem;">&#10094;</button>
-                    <button onclick="changeImage(1)"
-                        style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); background: rgba(0,0,0,0.5); border: none; color: white; padding: 10px; cursor: pointer; border-radius: 50%; font-size: 1.2rem;">&#10095;</button>
+                <div class="gallery-container" id="swipeContainer" style="position: relative; border-radius: 12px; overflow: hidden; margin-bottom: 20px; background-color: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; width: 100%;">
+                    
+                    <!-- Media Views -->
+                    <img id="mainImage" th:src="${art.imageUrl}" th:alt="${art.title}" style="width: 100%; display: block; transition: opacity 0.3s ease; object-fit: contain; max-height: 75vh; border-radius: 12px;">
+                    
+                    <video id="mainVideo" controls th:poster="${not #strings.isEmpty(art.thumbnailUrl) ? art.thumbnailUrl : art.imageUrl}" style="width: 100%; display: none; transition: opacity 0.3s ease; max-height: 75vh; object-fit: contain; border-radius: 12px;">
+                        <source src="" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
                 </div>
 
-                <!-- Dots / Thumbnails Navigation -->
-                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                    <img th:src="${art.imageUrl}" class="gallery-dot active" onclick="setImage(0)"
-                        style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; cursor: pointer; border: 2px solid var(--accent-color); opacity: 1;">
-
-                    <th:block th:each="img, stat : ${art.imageUrls}">
-                        <img th:src="${img}" class="gallery-dot" th:onclick="'setImage(' + ${stat.count} + ')'"
-                            style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; cursor: pointer; border: 2px solid transparent; opacity: 0.6;">
-                    </th:block>
+                <!-- Thumbnails Navigation (Scrollable) -->
+                <div id="gallery-dots-container" class="glass-panel" style="display: flex; gap: 12px; overflow-x: auto; flex-wrap: nowrap; padding: 12px; -ms-overflow-style: none; scrollbar-width: none; scroll-behavior: smooth; width: 100%; border-radius: 16px;">
+                   <!-- Rendered by JS -->
                 </div>
 
-                <!-- Render image URLs as hidden elements to be read by JS -->
-                <div id="gallery-data" style="display:none;">
-                    <span class="gallery-img-url" th:text="${art.imageUrl}"></span>
+                <!-- Hidden Data Store for JS Media Initialization -->
+                <div id="media-data-store" style="display: none;">
+                    <span class="media-data-item" data-type="image" th:data-url="${art.imageUrl}" th:data-thumb="${not #strings.isEmpty(art.thumbnailUrl) ? art.thumbnailUrl : art.imageUrl}"></span>
+                    <span th:if="${not #strings.isEmpty(art.videoUrl)}" class="media-data-item" data-type="video" th:data-url="${art.videoUrl}" th:data-thumb="${not #strings.isEmpty(art.thumbnailUrl) ? art.thumbnailUrl : art.imageUrl}"></span>
                     <th:block th:each="img : ${art.imageUrls}">
-                        <span class="gallery-img-url" th:text="${img}"></span>
+                        <span class="media-data-item" data-type="image" th:data-url="${img}" th:data-thumb="${img}"></span>
                     </th:block>
                 </div>
 
                 <script>
                     const mainImage = document.getElementById('mainImage');
-
-                    // Read images from DOM
-                    const galleryData = document.getElementById('gallery-data');
-                    const allImages = Array.from(galleryData.querySelectorAll('.gallery-img-url')).map(span => span.textContent);
+                    const mainVideo = document.getElementById('mainVideo');
+                    const dotsContainer = document.getElementById('gallery-dots-container');
+                    const swipeContainer = document.getElementById('swipeContainer');
+                    
+                    // Parse media items from DOM
+                    const mediaItemsNodeList = document.querySelectorAll('.media-data-item');
+                    const mediaItems = Array.from(mediaItemsNodeList).map(el => ({
+                        type: el.getAttribute('data-type'),
+                        url: el.getAttribute('data-url'),
+                        thumb: el.getAttribute('data-thumb')
+                    }));
 
                     let currentIndex = 0;
+                    let slideShowInterval;
 
-                    function setImage(index) {
-                        currentIndex = index;
-                        updateGallery();
+                    function startSlideShow() {
+                        stopSlideShow();
+                        // Only auto-slide if more than 1 item
+                        if(mediaItems.length > 1) {
+                            slideShowInterval = setInterval(() => {
+                                // Don't auto-slide if video is currently playing
+                                if(mainVideo.style.display === 'block' && !mainVideo.paused && !mainVideo.ended) {
+                                    return;
+                                }
+                                changeMedia(1);
+                            }, 3000); // 3 seconds
+                        }
                     }
 
-                    function changeImage(direction) {
-                        currentIndex += direction;
-                        if (currentIndex >= allImages.length) currentIndex = 0;
-                        if (currentIndex < 0) currentIndex = allImages.length - 1;
-                        updateGallery();
+                    function stopSlideShow() {
+                        if(slideShowInterval) clearInterval(slideShowInterval);
                     }
 
-                    function updateGallery() {
-                        mainImage.style.opacity = '0';
-                        setTimeout(() => {
-                            if (allImages.length > 0) {
-                                mainImage.src = allImages[currentIndex];
-                            }
-                            mainImage.style.opacity = '1';
-                        }, 200);
+                    // Restart slide show timer on user interaction
+                    function resetSlideShow() {
+                        startSlideShow();
+                    }
 
-                        // Update dots active state
-                        const dots = document.querySelectorAll('.gallery-dot');
-                        dots.forEach((dot, idx) => {
-                            if (idx === currentIndex) {
-                                dot.style.border = '2px solid var(--accent-color)';
-                                dot.style.opacity = '1';
-                            } else {
-                                dot.style.border = '2px solid transparent';
-                                dot.style.opacity = '0.6';
+                    function initGallery() {
+                        dotsContainer.innerHTML = '';
+                        mediaItems.forEach((item, index) => {
+                            const dotContainer = document.createElement('div');
+                            dotContainer.style.position = 'relative';
+                            dotContainer.style.cursor = 'pointer';
+                            dotContainer.style.flexShrink = '0';
+                            dotContainer.onclick = () => {
+                                setMedia(index);
+                                resetSlideShow();
+                            };
+
+                            const img = document.createElement('img');
+                            img.src = item.thumb;
+                            img.className = 'gallery-dot';
+                            img.style.width = '70px';
+                            img.style.height = '70px';
+                            img.style.objectFit = 'cover';
+                            img.style.borderRadius = '8px';
+                            img.style.transition = 'all 0.3s ease';
+                            
+                            dotContainer.appendChild(img);
+
+                            if (item.type === 'video') {
+                                // Add Play Overlay
+                                const playIcon = document.createElement('div');
+                                playIcon.innerHTML = '▶';
+                                Object.assign(playIcon.style, {
+                                    position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                                    color: 'white', background: 'rgba(0,0,0,0.6)', borderRadius: '50%',
+                                    width: '28px', height: '28px', display: 'flex', alignItems: 'center',
+                                    justifyContent: 'center', fontSize: '0.9rem', pointerEvents: 'none', border: '1px solid rgba(255,255,255,0.7)',
+                                    backdropFilter: 'blur(2px)'
+                                });
+                                dotContainer.appendChild(playIcon);
                             }
+                            dotsContainer.appendChild(dotContainer);
                         });
+                        updateMediaDisplay(false);
+                        startSlideShow();
                     }
+
+                    function setMedia(index) {
+                        if (currentIndex === index) return;
+                        currentIndex = index;
+                        updateMediaDisplay(true);
+                    }
+
+                    function changeMedia(direction) {
+                        currentIndex += direction;
+                        if (currentIndex >= mediaItems.length) currentIndex = 0;
+                        if (currentIndex < 0) currentIndex = mediaItems.length - 1;
+                        updateMediaDisplay(true);
+                    }
+
+                    function updateMediaDisplay(animate) {
+                        const currentItem = mediaItems[currentIndex];
+                        
+                        if (animate) {
+                            mainImage.style.opacity = '0';
+                            mainVideo.style.opacity = '0';
+                        }
+
+                        setTimeout(() => {
+                            mainVideo.pause();
+
+                            if (currentItem.type === 'video') {
+                                mainImage.style.display = 'none';
+                                mainVideo.style.display = 'block';
+                                mainVideo.src = currentItem.url;
+                            } else {
+                                mainVideo.style.display = 'none';
+                                mainImage.style.display = 'block';
+                                mainImage.src = currentItem.url;
+                            }
+                            
+                            mainImage.style.opacity = '1';
+                            mainVideo.style.opacity = '1';
+                        }, animate ? 200 : 0);
+
+                        // Update dots active state and scroll into view
+                        const dotContainers = dotsContainer.children;
+                        for(let i=0; i<dotContainers.length; i++) {
+                            const img = dotContainers[i].querySelector('img');
+                            if (i === currentIndex) {
+                                img.style.border = '2px solid var(--accent-color)';
+                                img.style.opacity = '1';
+                                img.style.transform = 'scale(1.05)';
+                                // Scroll thumbnail into view
+                                dotContainers[i].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                            } else {
+                                img.style.border = '2px solid transparent';
+                                img.style.opacity = '0.5';
+                                img.style.transform = 'scale(1)';
+                            }
+                        }
+                    }
+
+                    // Pause slideshow when video is interacted with
+                    mainVideo.addEventListener('play', stopSlideShow);
+                    mainVideo.addEventListener('pause', startSlideShow);
+                    mainVideo.addEventListener('ended', startSlideShow);
+
+                    // Touch Swipe Logic for Main Gallery
+                    let touchstartX = 0;
+                    let touchendX = 0;
+
+                    swipeContainer.addEventListener('touchstart', e => {
+                        stopSlideShow();
+                        touchstartX = e.changedTouches[0].screenX;
+                    }, {passive: true});
+
+                    swipeContainer.addEventListener('touchend', e => {
+                        touchendX = e.changedTouches[0].screenX;
+                        handleSwipe();
+                        resetSlideShow();
+                    }, {passive: true});
+
+                    function handleSwipe() {
+                        const threshold = 50; 
+                        if (touchendX < touchstartX - threshold) changeMedia(1); // Swipe left
+                        if (touchendX > touchstartX + threshold) changeMedia(-1); // Swipe right
+                    }
+
+                    // Initialize on load
+                    document.addEventListener('DOMContentLoaded', initGallery);
                 </script>
             </div>
 
@@ -95,7 +216,6 @@
                 <div style="display: flex; gap: 15px; margin-bottom: 20px;">
                     <span class="status-badge" style="background: var(--accent-color); color: white;"
                         th:text="${art.category}">Category</span>
-
                 </div>
 
                 <p th:text="${art.description}"
@@ -108,11 +228,9 @@
                     <p style="margin-bottom: 20px; color: var(--text-secondary);">Every piece is unique, but we can
                         create a similar artwork tailored to your preferences.</p>
                     <a th:href="@{/order(artType=${art.category}, refTitle=${art.title})}" class="btn"
-                        style="width: 100%; text-align: center;">Book Similar</a>
+                        style="width: 100%; text-align: center; margin-bottom: 15px;">Book Similar</a>
                 </div>
             </div>
-
-        </div>
     </div>
 
     <div th:replace="~{fragments :: chat}"></div>

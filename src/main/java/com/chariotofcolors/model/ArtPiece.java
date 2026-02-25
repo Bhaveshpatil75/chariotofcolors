@@ -19,6 +19,7 @@ public class ArtPiece {
 
     private String category; // e.g. Canvas, Sketch
     private String imageUrl; // Main image URL
+    private String videoUrl; // Optional Video URL (e.g. Cloudinary mp4)
 
     // For simplicity, additional images can be stored as a comma-separated string
     // or just hardcoded for this demo, but let's add a placeholder field.
